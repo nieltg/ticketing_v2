@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import set_rollback
 
 from .models import SouvenirRedeem, Ticket, TicketPurchase
-from .serializers import RedeemRequestSerializer, RedeemResponseSerializer
+from .serializers import (RedeemPurchaseRequestSerializer,
+                          RedeemRequestSerializer, RedeemResponseSerializer)
 
 
 @api_view(['POST'])
@@ -40,7 +41,27 @@ def redeem(request: Request) -> Response:
 
 @api_view(['POST'])
 def redeem_purchase(request: Request) -> Response:
-    pass
+    serializer = RedeemPurchaseRequestSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+
+    ticket = serializer.validated_data['ticket']
+
+    try:
+        _ = ticket.ticket_purchase
+
+        raise exceptions.APIException(
+            "Ticket has been purchased", code="ticket_purchased")
+    except ObjectDoesNotExist:
+        pass
+
+    ticket_purchase = TicketPurchase.objects.create(
+        **serializer.validated_data['ticket_purchase'], ticket=ticket)
+
+    souvenir_redeem = SouvenirRedeem(ticket_purchase=ticket_purchase)
+    souvenir_redeem.save()
+
+    out = RedeemResponseSerializer(ticket_purchase)
+    return Response(out.data)
 
 
 def exception_handler(exc, context):
