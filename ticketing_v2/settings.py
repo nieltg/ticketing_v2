@@ -122,6 +122,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# django-rest-framework
+REST_FRAMEWORK = {'EXCEPTION_HANDLER': 'api.views.exception_handler'}
+
 # Heroku
 if env('DYNO', default=None) is not None:
     import django_heroku
