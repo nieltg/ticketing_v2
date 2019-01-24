@@ -36,6 +36,7 @@ ALLOWED_HOSTS = env('ALLOWED_HOSTS', default=[])
 
 INSTALLED_APPS = [
     'api',
+    'import_export',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
