@@ -65,6 +65,8 @@ class TicketRedeemTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, expected.data)
 
+        self.assertIsNotNone(self.data_ticket.ticket_purchase.souvenir_redeem)
+
 
 class TicketPurchaseRedeemTest(APITestCase):
     client = APIClient()
@@ -82,6 +84,8 @@ class TicketPurchaseRedeemTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, expected.data)
+
+        self.assertIsNotNone(self.data_ticket_purchase.souvenir_redeem)
 
     def test_redeem_purchase_no_redeem(self):
         ticket_purchase_data = TicketPurchaseFactory.stub().__dict__
