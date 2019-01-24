@@ -1,3 +1,4 @@
 Django>=2.1
 django-environ
 djangorestframework
+factory_boy
