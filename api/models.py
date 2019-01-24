@@ -11,7 +11,10 @@ class Ticket(models.Model):
 
 class TicketPurchase(models.Model):
     ticket = models.OneToOneField(
-        Ticket, on_delete=models.PROTECT, primary_key=True)
+        Ticket,
+        on_delete=models.PROTECT,
+        primary_key=True,
+        related_name='ticket_purchase')
 
     name = models.TextField(blank=False, null=False)
     email = models.EmailField(blank=False, null=False)
@@ -23,7 +26,10 @@ class TicketPurchase(models.Model):
 
 class SouvenirRedeem(models.Model):
     ticket_purchase = models.OneToOneField(
-        TicketPurchase, on_delete=models.PROTECT, primary_key=True)
+        TicketPurchase,
+        on_delete=models.PROTECT,
+        primary_key=True,
+        related_name='souvenir_redeem')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
