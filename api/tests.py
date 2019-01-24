@@ -17,6 +17,20 @@ class EmptyRedeemViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_redeem_purchase_no_object(self):
+        ticket_purchase_data = TicketPurchaseFactory.stub().__dict__
+        ticket_purchase_data.pop('ticket', None)
+
+        response = self.client.post(
+            reverse('redeem-purchase'),
+            data={
+                'ticket': "1234567890000",
+                'ticket_purchase': ticket_purchase_data
+            },
+            format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class TicketRedeemTest(APITestCase):
     client = APIClient()
@@ -32,6 +46,24 @@ class TicketRedeemTest(APITestCase):
         self.assertEqual(response.status_code,
                          status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertEqual(response.data['code'], 'ticket_not_purchased')
+
+    def test_redeem_purchase_no_purchase(self):
+        ticket_purchase_data = TicketPurchaseFactory.stub().__dict__
+        ticket_purchase_data.pop('ticket', None)
+
+        response = self.client.post(
+            reverse('redeem-purchase'),
+            data={
+                'ticket': self.data_ticket.code,
+                'ticket_purchase': ticket_purchase_data
+            },
+            format='json')
+
+        expected = RedeemResponseSerializer(data=ticket_purchase_data)
+        expected.is_valid(raise_exception=True)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, expected.data)
 
 
 class TicketPurchaseRedeemTest(APITestCase):
@@ -51,6 +83,22 @@ class TicketPurchaseRedeemTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, expected.data)
 
+    def test_redeem_purchase_no_redeem(self):
+        ticket_purchase_data = TicketPurchaseFactory.stub().__dict__
+        ticket_purchase_data.pop('ticket', None)
+
+        response = self.client.post(
+            reverse('redeem-purchase'),
+            data={
+                'ticket': self.data_ticket_purchase.ticket.code,
+                'ticket_purchase': ticket_purchase_data
+            },
+            format='json')
+
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.data['code'], 'ticket_purchased')
+
 
 class SouvenirRedeemRedeemTest(APITestCase):
     client = APIClient()
@@ -68,3 +116,21 @@ class SouvenirRedeemRedeemTest(APITestCase):
         self.assertEqual(response.status_code,
                          status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertEqual(response.data['code'], 'souvenir_redeemed')
+
+    def test_redeem_purchase_redeemed(self):
+        ticket_purchase_data = TicketPurchaseFactory.stub().__dict__
+        ticket_purchase_data.pop('ticket', None)
+
+        ticket_purchase = self.data_souvenir_redeem.ticket_purchase
+
+        response = self.client.post(
+            reverse('redeem-purchase'),
+            data={
+                'ticket': ticket_purchase.ticket.code,
+                'ticket_purchase': ticket_purchase_data
+            },
+            format='json')
+
+        self.assertEqual(response.status_code,
+                         status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertEqual(response.data['code'], 'ticket_purchased')
