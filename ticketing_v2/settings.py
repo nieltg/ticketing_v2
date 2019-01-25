@@ -36,6 +36,7 @@ ALLOWED_HOSTS = env('ALLOWED_HOSTS', default=[])
 
 INSTALLED_APPS = [
     'api',
+    'app',
     'import_export',
     'rest_framework',
     'django.contrib.admin',
@@ -61,7 +62,9 @@ ROOT_URLCONF = 'ticketing_v2.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'web/dist')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,6 +125,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Webpack
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'web/dist/static')
+]
 
 # django-rest-framework
 REST_FRAMEWORK = {'EXCEPTION_HANDLER': 'api.views.exception_handler'}
